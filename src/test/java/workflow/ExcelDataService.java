@@ -116,5 +116,7 @@ public class ExcelDataService {
         System.out.println("Allergies: " + service.getAllergies());
         System.out.println("LCHF ADD ITEMS : " + service.getLCHFAddItems());
         System.out.println("LCHF elimanimate ITEMS: " + service.getLCHFEliminateItems());
+        System.out.println("LFVELIMINATE  ITEMS: " + service.getLFVEliminateItems());
+        System.out.println("LFVADDITEMS  ITEMS: " + service.getLFVAddItems());
     }
 }

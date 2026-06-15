@@ -33,18 +33,23 @@ public class SearchRecipes {
      *    - Waits until recipe links appear in the search results.
      */
     public void searchByFoodCategory(String foodCategory) {
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
-        input.clear();
-        input.sendKeys(foodCategory);
+        try {
+            WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
+            input.clear();
+            input.sendKeys(foodCategory);
 
-        List<WebElement> searchButtons = driver.findElements(searchButton);
-        if (!searchButtons.isEmpty() && searchButtons.get(0).isDisplayed()) {
-            searchButtons.get(0).click();
-        } else {
-            input.sendKeys(Keys.ENTER);
+            List<WebElement> searchButtons = driver.findElements(searchButton);
+            if (!searchButtons.isEmpty() && searchButtons.get(0).isDisplayed()) {
+                searchButtons.get(0).click();
+            } else {
+                input.sendKeys(Keys.ENTER);
+            }
+
+            wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
+
+        } catch (Exception e) {
+            throw new AssertionError("Issue while searching food category: " + foodCategory + " | " + e.getMessage(), e);
         }
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
     }
     public List<String> getRecipeUrls() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
