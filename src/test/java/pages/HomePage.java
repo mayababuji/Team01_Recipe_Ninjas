@@ -31,4 +31,5 @@ public class HomePage {
 //        driver.findElement(searchBox).sendKeys(foodCategory);
 //        wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
 //    }
+
 }

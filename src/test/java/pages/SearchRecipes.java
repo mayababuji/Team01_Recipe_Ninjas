@@ -1,10 +1,11 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchRecipes {
 
@@ -12,8 +13,9 @@ public class SearchRecipes {
     private final WebDriverWait wait;
     private final JavascriptExecutor js;
 
-    private final By searchBox = By.xpath("//input[@type='text' or @name='q' or contains(@placeholder,'Search') or contains(@placeholder,'recipe')]");
-    private final By searchButton = By.xpath("//button[@type='submit'] | //input[@type='submit'] | //button[contains(.,'Search')]");
+    private final By searchBox = By.cssSelector("//input[@type='search']");
+    private final By searchButton = By.xpath("//i[@class='fa fa-search']");
+    private final By recipeLinks = By.xpath("//h5[@class='mb-0 two-line-text']/a");
 
 
     public SearchRecipes(WebDriver driver) {
@@ -30,6 +32,35 @@ public class SearchRecipes {
      *    - Clicks the search button if present, otherwise presses Enter.
      *    - Waits until recipe links appear in the search results.
      */
+    public void searchByFoodCategory(String foodCategory) {
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
+        input.clear();
+        input.sendKeys(foodCategory);
+
+        List<WebElement> searchButtons = driver.findElements(searchButton);
+        if (!searchButtons.isEmpty() && searchButtons.get(0).isDisplayed()) {
+            searchButtons.get(0).click();
+        } else {
+            input.sendKeys(Keys.ENTER);
+        }
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
+    }
+    public List<String> getRecipeUrls() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
+        List<String> urls = new ArrayList<>();
+        for (WebElement e : driver.findElements(recipeLinks)) {
+            String href = e.getAttribute("href");
+            if (href != null && !href.isBlank()) {
+                urls.add(href);
+            }
+        }
+        return urls;
+    }
+
+    public List<String> getRecipeLinks() {
+        return getRecipeUrls();
+    }
 
     /**
      * 2. Gets the total recipe count from the results text.

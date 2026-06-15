@@ -8,10 +8,7 @@ import pages.ScrapeRecipes;
 import workflow.ExcelDataService;
 import workflow.RecipeFilterService;
 
-import java.util.ArrayList;
-
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RecipeScrapeTest extends BaseTest {
 
@@ -32,66 +29,65 @@ public class RecipeScrapeTest extends BaseTest {
         List<String> lchfEliminate = excelDataService.getLCHFEliminateItems();
         List<String> lchfAdd = excelDataService.getLCHFAddItems();
 
-        List<Map<String, String>> allRecipes = new ArrayList<>();
-        List<Map<String, String>> lfvPassedRecipes = new ArrayList<>();
-        List<Map<String, String>> lfvAddonRecipes = new ArrayList<>();
-        List<Map<String, String>> lfvMilkAllergyRecipes = new ArrayList<>();
-        List<Map<String, String>> lfvNutAllergyRecipes = new ArrayList<>();
-
-        List<Map<String, String>> lchfPassedRecipes = new ArrayList<>();
-        List<Map<String, String>> lchfAddonRecipes = new ArrayList<>();
-        List<Map<String, String>> lchfMilkAllergyRecipes = new ArrayList<>();
-        List<Map<String, String>> lchfNutAllergyRecipes = new ArrayList<>();
+        Map<String, Object[]> allRecipes = new TreeMap<>();
+        Map<String, Object[]> lfvPassedRecipes = new TreeMap<>();
+        Map<String, Object[]> lfvAddonRecipes = new TreeMap<>();
+        Map<String, Object[]> lfvMilkAllergyRecipes = new TreeMap<>();
+        Map<String, Object[]> lfvNutAllergyRecipes = new TreeMap<>();
+        Map<String, Object[]> lchfPassedRecipes = new TreeMap<>();
+        Map<String, Object[]> lchfAddonRecipes = new TreeMap<>();
+        Map<String, Object[]> lchfMilkAllergyRecipes = new TreeMap<>();
+        Map<String, Object[]> lchfNutAllergyRecipes = new TreeMap<>();
 
         homePage.openHomePage();
-//        1. For each food category in the food category list:
-//        a. Search recipes for that food category
-//        b. Get all recipe links from the search results
-//
-//        c. For each recipe link:
-//        i. Scrape recipe details from the recipe page
-//        ii. Add the scraped recipe to the master recipe list
-//
-//        iii. Convert the ingredients text into a list
-//
-//        iv. Check LFV rules:
-//        - If ingredient list does not contain any LFV eliminate items:
-//        - Add recipe to LFV passed list
-//                - Create a copy of recipe
-//        - Add missing LFV add ingredients into ingredient list
-//                - Update ingredients field in the copied recipe
-//        - Mark extra_info as LFV add-on applied
-//                - Add copied recipe to LFV add-on list
-//                - If recipe contains milk allergen:
-//        - Add to LFV milk allergy list
-//                - If recipe contains nut allergen:
-//        - Add to LFV nut allergy list
-//
-//        v. Check LCHF rules:
-//        - If ingredient list does not contain any LCHF eliminate items:
-//        - Add recipe to LCHF passed list
-//                - Create a copy of recipe
-//        - Add missing LCHF add ingredients into ingredient list
-//                - Update ingredients field in the copied recipe
-//        - Mark extra_info as LCHF add-on applied
-//                - Add copied recipe to LCHF add-on list
-//                - If recipe contains milk allergen:
-//        - Add to LCHF milk allergy list
-//                - If recipe contains nut allergen:
-//        - Add to LCHF nut allergy list
-//
-//        2. Insert all collected recipe lists into database tables:
-//        - Insert all scraped recipes
-//                - Insert LFV passed recipes
-//                - Insert LFV add-on recipes
-//                - Insert LFV milk allergy recipes
-//        - Insert LFV nut allergy recipes
-//        - Insert LCHF passed recipes
-//                - Insert LCHF add-on recipes
-//                - Insert LCHF milk allergy recipes
-//        - Insert LCHF nut allergy recipes
-//
-//        END test
 
+        for (String foodCategory : foodCategories) {
+            System.out.println("Step 5 : Searcning for  food category " + foodCategory);
+            searchRecipes.searchByFoodCategory(foodCategory);
+
+            List<String> recipeLinks = searchRecipes.getRecipeLinks();
+
+            for (String recipeLink : recipeLinks) {
+                Map<String, String> recipeData = scrapeRecipes.scrapeRecipe(recipeLink, foodCategory);
+
+                List<String> ingredientList = convertIngredientsToList(recipeData.get("ingredients"));
+
+                boolean lfvPass = recipeFilterService.passesElimination(ingredientList, lfvEliminate);
+
+                if (lfvPass) {
+                    if (recipeFilterService.containsNutAllergen(ingredientList)) {
+                        lfvNutAllergyRecipes.put("LFV_NUT_" + recipeData.get("recipe_id"), new Object[] {
+                                recipeData.get("recipe_id"),
+                                recipeData.get("recipe_name"),
+                                recipeData.get("recipe_category"),
+                                recipeData.get("food_category"),
+                                recipeData.get("ingredients"),
+                                recipeData.get("preparation_time"),
+                                recipeData.get("cooking_time"),
+                                recipeData.get("tag"),
+                                recipeData.get("no_of_servings"),
+                                recipeData.get("cuisine_category"),
+                                recipeData.get("recipe_description"),
+                                recipeData.get("preparation_method"),
+                                recipeData.get("nutrient_values"),
+                                recipeData.get("recipe_url")
+                        });
+                    }
+                }
+            }
+        }
+
+        dbQueries.insertRow(conn, "lfv_recipes_allergy_with_nut", lfvNutAllergyRecipes);
+    }
+
+    private List<String> convertIngredientsToList(String ingredientsText) {
+        if (ingredientsText == null || ingredientsText.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return Arrays.stream(ingredientsText.split(","))
+                .map(String::trim)
+                .filter(item -> !item.isEmpty())
+                .toList();
     }
 }
