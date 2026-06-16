@@ -28,6 +28,46 @@ public class RecipeFilterService {
         }
         return true;
     }
+    
+    /*   ****************************CodeAdded***************************** */
+    
+    
+    
+    public String passesEliminationStr(List<String> recipeIngredients, List<String> eliminateList) {
+        for (String ingredient : recipeIngredients) {
+            String normalizedIngredient = ingredient.toLowerCase().trim();
+
+            for (String eliminateItem : eliminateList) {
+                String normalizedEliminate = eliminateItem.toLowerCase().trim();
+
+                if (!normalizedEliminate.isEmpty() &&
+                        normalizedIngredient.contains(normalizedEliminate)) {
+                    return "FOUND"; // not updating the table nut allergy table
+                }
+            }
+        }
+        return "NOTFOUNFD";
+    }
+    
+    public String passesLCHAddStr(List<String> recipeIngredients, List<String> eliminateList) {
+        for (String ingredient : recipeIngredients) {
+            String normalizedIngredient = ingredient.toLowerCase().trim();
+
+            for (String eliminateItem : eliminateList) {
+                String normalizedEliminate = eliminateItem.toLowerCase().trim();
+
+                if (!normalizedEliminate.isEmpty() &&
+                        normalizedIngredient.contains(normalizedEliminate)) {
+                    return "FOUND"; // not updating the table nut allergy table
+                }
+            }
+        }
+        return "NOTFOUNFD";
+    }
+
+    /*   ****************************Code END***************************** */
+ 
+    
     /**
      * 2. Adds missing ingredients from the add list.  -- have to check if we really needs to implement
      *    - Creates a copy of the original ingredient list.
