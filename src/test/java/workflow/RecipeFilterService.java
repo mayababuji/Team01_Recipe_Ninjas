@@ -36,6 +36,29 @@ public class RecipeFilterService {
      *    - Returns the updated ingredient list.
      */
 
+    
+    public List<String> addMissingIngredients(List<String> recipeIngredients,
+            List<String> addList) {
+
+    	// Create a copy of the original ingredient list
+    	List<String> updatedIngredients = new ArrayList<>(recipeIngredients);
+
+    	for (String addItem : addList) {
+    			boolean alreadyExists = false;
+    			for (String ingredient : recipeIngredients) {
+    				if (ingredient.toLowerCase().trim().contains(addItem.toLowerCase().trim())) {
+    					alreadyExists = true;
+    					break;
+    					}
+    				}
+    		
+    			if (!alreadyExists) {
+    				updatedIngredients.add(addItem);
+    				}
+    		}
+
+return updatedIngredients;
+}
     /**
      * 3. Checks whether any allergen is present.
      *    - Loops through each recipe ingredient.

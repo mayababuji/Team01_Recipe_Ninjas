@@ -53,7 +53,10 @@ public class RecipeScrapeTest extends BaseTest {
                 List<String> ingredientList = convertIngredientsToList(recipeData.get("ingredients"));
 
                 boolean lfvPass = recipeFilterService.passesElimination(ingredientList, lfvEliminate);
-
+                boolean lchfPass = recipeFilterService.passesElimination(ingredientList, lchfEliminate);
+                
+               //LFV eliminate
+                
                 if (lfvPass) {
                     if (recipeFilterService.containsNutAllergen(ingredientList)) {
                         lfvNutAllergyRecipes.put("LFV_NUT_" + recipeData.get("recipe_id"), new Object[] {
@@ -73,11 +76,92 @@ public class RecipeScrapeTest extends BaseTest {
                                 recipeData.get("recipe_url")
                         });
                     }
+                    List<String> lfvUpdatedIngredients = recipeFilterService.addMissingIngredients( ingredientList, lfvAdd);
+                
+               //lfv add ingredients if lfv pass
+                    
+                    if (lfvUpdatedIngredients.size() > ingredientList.size()) {
+
+                    lfvAddonRecipes.put("LFV_ADD_" + recipeData.get("recipe_id"),
+                            new Object[] {
+                                    recipeData.get("recipe_id"),
+                                    recipeData.get("recipe_name"),
+                                    recipeData.get("recipe_category"),
+                                    recipeData.get("food_category"),
+
+                                    // Updated ingredients after adding missing items
+                                    String.join(", ", lfvUpdatedIngredients),
+
+                                    recipeData.get("preparation_time"),
+                                    recipeData.get("cooking_time"),
+                                    recipeData.get("tag"),
+                                    recipeData.get("no_of_servings"),
+                                    recipeData.get("cuisine_category"),
+                                    recipeData.get("recipe_description"),
+                                    recipeData.get("preparation_method"),
+                                    recipeData.get("nutrient_values"),
+                                    recipeData.get("recipe_url")
+                            });
                 }
+                
+                }
+                
+                //LCHF eliminate
+                
+                if (lchfPass) {
+                    if (recipeFilterService.containsNutAllergen(ingredientList)) {
+                    	lchfNutAllergyRecipes.put("LCHF_NUT_" + recipeData.get("recipe_id"), new Object[] {
+                                recipeData.get("recipe_id"),
+                                recipeData.get("recipe_name"),
+                                recipeData.get("recipe_category"),
+                                recipeData.get("food_category"),
+                                recipeData.get("ingredients"),
+                                recipeData.get("preparation_time"),
+                                recipeData.get("cooking_time"),
+                                recipeData.get("tag"),
+                                recipeData.get("no_of_servings"),
+                                recipeData.get("cuisine_category"),
+                                recipeData.get("recipe_description"),
+                                recipeData.get("preparation_method"),
+                                recipeData.get("nutrient_values"),
+                                recipeData.get("recipe_url")
+                        });
+                    }
+                
+                //LCHF add if lchfpass
+         List<String> lchfUpdatedIngredients = recipeFilterService.addMissingIngredients( ingredientList,lchfAdd);
+                
+         if (lchfUpdatedIngredients.size() > ingredientList.size()) {
+
+                    lchfAddonRecipes.put("LCHF_ADD_" + recipeData.get("recipe_id"),
+                            new Object[] {
+                                    recipeData.get("recipe_id"),
+                                    recipeData.get("recipe_name"),
+                                    recipeData.get("recipe_category"),
+                                    recipeData.get("food_category"),
+
+                                    String.join(", ", lchfUpdatedIngredients),
+
+                                    recipeData.get("preparation_time"),
+                                    recipeData.get("cooking_time"),
+                                    recipeData.get("tag"),
+                                    recipeData.get("no_of_servings"),
+                                    recipeData.get("cuisine_category"),
+                                    recipeData.get("recipe_description"),
+                                    recipeData.get("preparation_method"),
+                                    recipeData.get("nutrient_values"),
+                                    recipeData.get("recipe_url")
+                            });
+                }
+              }
             }
         }
 
         dbQueries.insertRow(conn, "lfv_recipes_allergy_with_nut", lfvNutAllergyRecipes);
+        dbQueries.insertRow(conn, "lchf_recipes_allergy_with_nut", lchfNutAllergyRecipes);
+
+        dbQueries.insertRow(conn, "lfv_recipes_addon", lfvAddonRecipes);
+        dbQueries.insertRow(conn, "lchf_recipes_addon", lchfAddonRecipes);
     }
 
     private List<String> convertIngredientsToList(String ingredientsText) {
