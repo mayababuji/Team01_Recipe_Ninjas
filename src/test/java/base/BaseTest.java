@@ -8,6 +8,7 @@ import utils.DBConnection;
 import utils.DBQueries;
 
 import java.sql.Connection;
+import java.util.Set;
 
 public class BaseTest {
 
@@ -21,8 +22,33 @@ public class BaseTest {
         conn = DBConnection.getConnection();
 
         dbQueries = new DBQueries();
-        dbQueries.createAllTables(conn);
+        //dbQueries.createAllTables(conn);
+        
+ /* ***************************************Code Added*************************************** */
+        
+        /*this code first checks for the table, if the table doesn't exist in DB then it will create the table*/
+        
+        Set<String> existingTables = dbQueries.getExistingTables(conn);
+
+		for (String table : DBQueries.tableNames) {
+
+			if (existingTables.contains(table.toLowerCase())) {
+
+				System.out.println("Table already exists : " + table);
+
+			} else {
+
+				System.out.println("Table does not exist : " + table);
+
+				dbQueries.createTable(conn, table);
+			}
+		}
+
     }
+    	 	
+/* ********************************************** Added Code End*********************************** */
+
+    
 
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
