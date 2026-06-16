@@ -13,7 +13,7 @@ public class SearchRecipes {
     private final WebDriverWait wait;
     private final JavascriptExecutor js;
 
-    private final By searchBox = By.cssSelector("//input[@type='search']");
+    private final By searchBox = By.xpath("//input[@type='search']");  // code change css to xpath
     private final By searchButton = By.xpath("//i[@class='fa fa-search']");
     private final By recipeLinks = By.xpath("//h5[@class='mb-0 two-line-text']/a");
 
@@ -32,25 +32,41 @@ public class SearchRecipes {
      *    - Clicks the search button if present, otherwise presses Enter.
      *    - Waits until recipe links appear in the search results.
      */
-    public void searchByFoodCategory(String foodCategory) {
-        try {
-            WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
-            input.clear();
-            input.sendKeys(foodCategory);
+   /* public void searchByFoodCategory(String foodCategory) {
+    	
+    	System.out.println("Current URL: " + driver.getCurrentUrl());
+        System.out.println("Page title: " + driver.getTitle());
+        
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
+        input.clear();
+        input.sendKeys(foodCategory);
 
-            List<WebElement> searchButtons = driver.findElements(searchButton);
-            if (!searchButtons.isEmpty() && searchButtons.get(0).isDisplayed()) {
-                searchButtons.get(0).click();
-            } else {
-                input.sendKeys(Keys.ENTER);
-            }
-
-            wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
-
-        } catch (Exception e) {
-            throw new AssertionError("Issue while searching food category: " + foodCategory + " | " + e.getMessage(), e);
+        List<WebElement> searchButtons = driver.findElements(searchButton);
+        if (!searchButtons.isEmpty() && searchButtons.get(0).isDisplayed()) {
+            searchButtons.get(0).click();
+        } else {
+            input.sendKeys(Keys.ENTER);
         }
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
     }
+    */
+    
+    public void searchByFoodCategory(String foodCategory) {
+
+        System.out.println("Current URL: " + driver.getCurrentUrl());
+        System.out.println("Page title: " + driver.getTitle());
+
+        WebElement input = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(searchBox));
+
+        input.clear();
+        input.sendKeys(foodCategory);
+        input.sendKeys(Keys.ENTER);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
+    }
+    
     public List<String> getRecipeUrls() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(recipeLinks));
         List<String> urls = new ArrayList<>();

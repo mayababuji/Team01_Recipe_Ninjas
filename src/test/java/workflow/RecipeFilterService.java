@@ -22,12 +22,47 @@ public class RecipeFilterService {
 
                 if (!normalizedEliminate.isEmpty() &&
                         normalizedIngredient.contains(normalizedEliminate)) {
-                    return false;
+                    return false; // not updating the table nut allergy table
                 }
             }
         }
         return true;
     }
+   /* ************************** CoDe Added ******************************** */
+    
+    public String passesEliminationStr(List<String> recipeIngredients, List<String> eliminateList) {
+        for (String ingredient : recipeIngredients) {
+            String normalizedIngredient = ingredient.toLowerCase().trim();
+
+            for (String eliminateItem : eliminateList) {
+                String normalizedEliminate = eliminateItem.toLowerCase().trim();
+
+                if (!normalizedEliminate.isEmpty() &&
+                        normalizedIngredient.contains(normalizedEliminate)) {
+                    return "FOUND"; // not updating the table nut allergy table
+                }
+            }
+        }
+        return "NOTFOUNFD";
+    }
+    
+    public String passesLCHAddStr(List<String> recipeIngredients, List<String> eliminateList) {
+        for (String ingredient : recipeIngredients) {
+            String normalizedIngredient = ingredient.toLowerCase().trim();
+
+            for (String eliminateItem : eliminateList) {
+                String normalizedEliminate = eliminateItem.toLowerCase().trim();
+
+                if (!normalizedEliminate.isEmpty() &&
+                        normalizedIngredient.contains(normalizedEliminate)) {
+                    return "FOUND"; // not updating the table nut allergy table
+                }
+            }
+        }
+        return "NOTFOUNFD";
+    }
+    
+    /* *****************************Code End *************************** */
     /**
      * 2. Adds missing ingredients from the add list.  -- have to check if we really needs to implement
      *    - Creates a copy of the original ingredient list.
@@ -36,29 +71,6 @@ public class RecipeFilterService {
      *    - Returns the updated ingredient list.
      */
 
-    
-    public List<String> addMissingIngredients(List<String> recipeIngredients,
-            List<String> addList) {
-
-    	// Create a copy of the original ingredient list
-    	List<String> updatedIngredients = new ArrayList<>(recipeIngredients);
-
-    	for (String addItem : addList) {
-    			boolean alreadyExists = false;
-    			for (String ingredient : recipeIngredients) {
-    				if (ingredient.toLowerCase().trim().contains(addItem.toLowerCase().trim())) {
-    					alreadyExists = true;
-    					break;
-    					}
-    				}
-    		
-    			if (!alreadyExists) {
-    				updatedIngredients.add(addItem);
-    				}
-    		}
-
-return updatedIngredients;
-}
     /**
      * 3. Checks whether any allergen is present.
      *    - Loops through each recipe ingredient.

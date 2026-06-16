@@ -6,7 +6,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import utils.DBConnection;
 import utils.DBQueries;
-
+import java.util.Set;
 import java.sql.Connection;
 
 public class BaseTest {
@@ -21,9 +21,34 @@ public class BaseTest {
         conn = DBConnection.getConnection();
 
         dbQueries = new DBQueries();
-        dbQueries.createAllTables(conn);
-    }
+        
+        //dbQueries.createAllTables(conn);
+    
+        /* ***************************************Code Added*************************************** */
+        
+        /*this code first checks for the table, if the table doesn't exist in DB then it will create the table*/
+        
+        Set<String> existingTables = dbQueries.getExistingTables(conn);
 
+		for (String table : DBQueries.tableNames) {
+
+			if (existingTables.contains(table.toLowerCase())) {
+
+				System.out.println("Table already exists : " + table);
+
+			} else {
+
+				System.out.println("Table does not exist : " + table);
+
+				dbQueries.createTable(conn, table);
+			}
+		}
+
+    }
+    	 	
+/* ********************************************** Added Code End*********************************** */
+    	
+    	
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
         if (driver != null) {
@@ -32,3 +57,4 @@ public class BaseTest {
         DBConnection.closeConnection(conn);
     }
 }
+    
